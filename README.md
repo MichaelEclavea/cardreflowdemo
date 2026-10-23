@@ -2,6 +2,23 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Compare Flexbox and Grid
+
+Run `npm start`, choose **Controlled** under Reflow Options, and switch between
+**Original (Flexbox)** and **Alternative (Grid)** under Card implementation.
+Both versions share the same cards, container width, row limit, gaps, and theme.
+Use **Visible cards** to test incomplete rows, a single row, or zero cards.
+
+The original `CardComponent` is unchanged. The alternative lives in
+`src/components/gridCardComponent/` and accepts the same prop shape through its
+own `IGridCardComponentProps`. It includes its own card presentation and uses CSS Grid for controlled reflow,
+without measuring the DOM or generating placeholder cards. Static and Dynamic
+retain the existing flex layouts in both versions.
+
+The `gridCardComponent` folder is self-contained and can be copied to another
+React/TypeScript project. See its [reuse instructions](src/components/gridCardComponent/README.md)
+for dependencies and an example.
+
 ## Available Scripts
 
 In the project directory, you can run:

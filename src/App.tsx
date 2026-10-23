@@ -2,14 +2,19 @@ import type * as React from 'react';
 import { useState } from 'react';
 import {
   Divider,
+  Field,
+  Radio,
+  RadioGroup,
   Subtitle2Stronger,
-  Switch,
-  SwitchOnChangeData
+  Switch
 } from '@fluentui/react-components';
+import type { SwitchOnChangeData } from '@fluentui/react-components';
 import { Counter } from './components/counter/Counter';
 import { Options } from './components/options/Options';
 import { useStyles } from './App.styles';
 import { CardComponent } from './components/cardComponent/CardComponent';
+import { GridCardComponent } from './components/gridCardComponent/GridCardComponent';
+import type { CardImplementationType } from './App.types';
 import { Header } from './components/header/Header';
 import { SliderController } from './components/slider/SliderController';
 import type {
@@ -59,8 +64,12 @@ export const App: React.FC = () => {
 
   const [isLightTheme, setIsLightTheme] = useState(true);
   const [maxCardsPerRow, setMaxCardsPerRow] = useState(5);
+  const [cardCount, setCardCount] = useState(demoCards.length);
+  const [cardImplementation, setCardImplementation] =
+    useState<CardImplementationType>('flexbox');
   const [reflowOption, setReflowOption] = useState<ReflowOptionType>('static');
   const [sliderValue, setSliderValue] = useState(100);
+  const CardsComponent = cardImplementation === 'grid' ? GridCardComponent : CardComponent;
 
   const renderComponentPane = () => {
     return (
@@ -85,6 +94,22 @@ export const App: React.FC = () => {
           <Divider />
         </div>
         <div className={styles.paneSection}>
+          <Field label={{ children: 'Card implementation', weight: 'semibold' }}>
+            <RadioGroup
+              value={cardImplementation}
+              onChange={(_, data) => {
+                if (data.value === 'flexbox' || data.value === 'grid') {
+                  setCardImplementation(data.value);
+                }
+              }}
+            >
+              <Radio value='flexbox' label='Original (Flexbox)' />
+              <Radio value='grid' label='Alternative (Grid)' />
+            </RadioGroup>
+          </Field>
+          <Divider />
+        </div>
+        <div className={styles.paneSection}>
           <Options value={reflowOption} onChange={setReflowOption} />
           <Divider />
         </div>
@@ -94,6 +119,16 @@ export const App: React.FC = () => {
             onChange={setMaxCardsPerRow}
             value={maxCardsPerRow}
             min={1}
+            max={demoCards.length}
+          />
+          <Divider />
+        </div>
+        <div className={styles.paneSection}>
+          <Counter
+            label='Visible cards'
+            onChange={setCardCount}
+            value={cardCount}
+            min={0}
             max={demoCards.length}
           />
         </div>
@@ -113,8 +148,8 @@ export const App: React.FC = () => {
             aria-label='Card preview'
             style={{ width: `${sliderValue}%` }}
           >
-            <CardComponent
-              cards={demoCards}
+            <CardsComponent
+              cards={demoCards.slice(0, cardCount)}
               maxCardsPerRow={maxCardsPerRow}
               reflowOption={reflowOption}
               rowGap={12}

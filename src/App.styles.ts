@@ -63,6 +63,7 @@ export const useStyles = makeStyles({
     }
   },
   controlPane: {
+    ...customScrollbar,
     backgroundColor: tokens.colorNeutralBackground1,
     border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
     borderRadius: tokens.borderRadius3XLarge,

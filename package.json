@@ -4,15 +4,15 @@
   "homepage": "https://michaeleclavea.github.io/cardreflowdemo",
   "private": true,
   "dependencies": {
-    "@fluentui/react": "^8.109.3",
+    "@fluentui/react-components": "^9.74.11",
+    "@fluentui/react-icons": "^2.0.344",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "node-sass": "^8.0.0",
-    "random-image-unsplash": "^1.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
+    "sass": "^1.93.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -20,7 +20,16 @@
     "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "test": "react-scripts test",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx --max-warnings 0",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^@fluentui/react-jsx-runtime/(jsx-runtime|jsx-dev-runtime)$": "<rootDir>/node_modules/@fluentui/react-jsx-runtime/lib-commonjs/$1.cjs",
+      "^@fluentui/react-icons/(?:lib/)?providers$": "<rootDir>/node_modules/@fluentui/react-icons/lib-cjs/providers.cjs"
+    }
   },
   "eslintConfig": {
     "extends": [
@@ -43,7 +52,12 @@
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "main": "index.js",
   "devDependencies": {
-    "gh-pages": "^5.0.0"
+    "@types/jest": "^27.5.2",
+    "@types/node": "^18.19.130",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "gh-pages": "^5.0.0",
+    "typescript": "~4.9.5"
   },
   "keywords": [],
   "author": "",

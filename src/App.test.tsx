@@ -54,22 +54,27 @@ const renderApp = () => {
   );
 };
 
-test('adds and removes cards with the Fluent buttons', () => {
+test.each(['Original (Flexbox)', 'Alternative (Grid)'])(
+  '%s adds and removes visible cards with the Fluent buttons', (implementation) => {
   renderApp();
+  fireEvent.click(screen.getByRole('radio', { name: implementation }));
   const preview = screen.getByRole('region', { name: 'Card preview' });
-  expect(within(preview).getAllByText(/^\d+$/)).toHaveLength(5);
+  const count = within(screen.getByRole('group', { name: 'Visible cards' }));
+  expect(within(preview).getAllByText(/^Card \d+$/)).toHaveLength(10);
   expect(screen.getByRole('radio', { name: 'Static' })).toBeChecked();
 
-  fireEvent.click(screen.getByRole('button', { name: 'Add card' }));
-  expect(within(preview).getAllByText(/^\d+$/)).toHaveLength(6);
-  expect(screen.getByRole('status', { name: 'Card count' })).toHaveTextContent('6');
+  fireEvent.click(count.getByRole('button', { name: 'Decrease card' }));
+  expect(within(preview).getAllByText(/^Card \d+$/)).toHaveLength(9);
+  expect(count.getByRole('status', { name: 'Card count' })).toHaveTextContent('9');
 
-  fireEvent.click(screen.getByRole('button', { name: 'Remove card' }));
-  expect(within(preview).getAllByText(/^\d+$/)).toHaveLength(5);
+  fireEvent.click(count.getByRole('button', { name: 'Increase card' }));
+  expect(within(preview).getAllByText(/^Card \d+$/)).toHaveLength(10);
 });
 
-test('changes reflow modes and handles zero cards in controlled mode', () => {
+test.each(['Original (Flexbox)', 'Alternative (Grid)'])(
+  '%s changes reflow modes and handles zero cards in controlled mode', (implementation) => {
   renderApp();
+  fireEvent.click(screen.getByRole('radio', { name: implementation }));
   const group = screen.getByRole('radiogroup', { name: 'Reflow Options' });
   const dynamic = within(group).getByRole('radio', { name: 'Dynamic' });
   const controlled = within(group).getByRole('radio', { name: 'Controlled' });
@@ -78,14 +83,37 @@ test('changes reflow modes and handles zero cards in controlled mode', () => {
   fireEvent.click(controlled);
   expect(controlled).toBeChecked();
 
-  const remove = screen.getByRole('button', { name: 'Remove card' });
-  for (let i = 0; i < 5; i += 1) fireEvent.click(remove);
+  const count = within(screen.getByRole('group', { name: 'Visible cards' }));
+  const remove = count.getByRole('button', { name: 'Decrease card' });
+  for (let i = 0; i < 10; i += 1) fireEvent.click(remove);
   const preview = screen.getByRole('region', { name: 'Card preview' });
-  expect(within(preview).queryAllByText(/^\d+$/)).toHaveLength(0);
+  expect(within(preview).queryAllByText(/^Card \d+$/)).toHaveLength(0);
   expect(remove).toBeDisabled();
 
-  fireEvent.click(screen.getByRole('button', { name: 'Add card' }));
-  expect(within(preview).getAllByText(/^\d+$/)).toHaveLength(1);
+  fireEvent.click(count.getByRole('button', { name: 'Increase card' }));
+  expect(within(preview).getAllByText(/^Card \d+$/)).toHaveLength(1);
+});
+
+test('preserves comparison settings when switching implementations', () => {
+  renderApp();
+  const preview = screen.getByRole('region', { name: 'Card preview' });
+  const count = within(screen.getByRole('group', { name: 'Visible cards' }));
+  const rowLimit = within(screen.getByRole('group', { name: 'Max cards per row' }));
+  fireEvent.click(screen.getByRole('radio', { name: 'Controlled' }));
+  fireEvent.change(screen.getByRole('slider', { name: 'Container width adjuster' }), {
+    target: { value: '40' }
+  });
+  fireEvent.click(count.getByRole('button', { name: 'Decrease card' }));
+  fireEvent.click(rowLimit.getByRole('button', { name: 'Decrease card' }));
+
+  for (const implementation of ['Alternative (Grid)', 'Original (Flexbox)']) {
+    fireEvent.click(screen.getByRole('radio', { name: implementation }));
+    expect(screen.getByRole('radio', { name: implementation })).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'Controlled' })).toBeChecked();
+    expect(preview).toHaveStyle({ width: '40%' });
+    expect(within(preview).getAllByText(/^Card \d+$/)).toHaveLength(9);
+    expect(rowLimit.getByRole('status', { name: 'Card count' })).toHaveTextContent('4');
+  }
 });
 
 test('updates the container width and clamps the slider after a mobile resize', () => {

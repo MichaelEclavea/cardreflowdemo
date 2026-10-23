@@ -1,9 +1,12 @@
-import styles from './header.module.scss';
+import { Title2 } from '@fluentui/react-components';
+import { useStyles } from './Header.styles';
 
 export const Header = () => {
+  const styles = useStyles();
+
   return (
     <header className={styles.appHeader}>
-      <h2>FlexBox Card Reflow Demo</h2>
+      <Title2 as="h2" className={styles.title}>FlexBox Card Reflow Demo</Title2>
     </header>
-  )
-}
+  );
+};
